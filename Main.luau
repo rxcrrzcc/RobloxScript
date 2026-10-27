@@ -36,7 +36,7 @@ local MobsFolderTable = {
 local bla = nil
 
 local function SetupUIThing(UIType: string, where, side: Enum.HorizontalAlignment)
-	if where == nil then return end
+	if where == nil or UIType == nil then return end
 	if UIType == "Layout" then
 		if side == nil then side = Enum.HorizontalAlignment.Left end
 		local NewLayout = Instance.new("UIListLayout")
@@ -50,6 +50,23 @@ local function SetupUIThing(UIType: string, where, side: Enum.HorizontalAlignmen
 	elseif UIType == "Drag" then
 		local DragDec = Instance.new("UIDragDetector")
 		DragDec.Parent = where
+	end
+end
+
+local function SetupUIThings2(UIType: string, strokeType: string, towhere, num: number, color: Color3)
+	if towhere == nil or UIType == nil or strokeType == nil then return end
+	if UIType == "Stroke" and strokeType == "border" then
+		local Stroke = Instance.new("UIStroke")
+		Stroke.Thickness = num 
+		Stroke.Color = color
+		Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		Stroke.Parent = towhere
+	elseif UIType == "Stroke" and strokeType == "text" then
+		local Stroke = Instance.new("UIStroke")
+		Stroke.Thickness = num 
+		Stroke.Color = color
+		Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+		Stroke.Parent = towhere
 	end
 end
 
@@ -122,6 +139,8 @@ local function SetupNewUIObj(ClassObj, Text: string, Objtype: string)
 		local NewUICorner = Instance.new("UICorner")
 		NewUICorner.CornerRadius = UDim.new(0, 5)
 		NewUICorner.Parent = NewButton
+		
+		SetupUIThings2("Stroke", "border", NewButton, 2, Color3.new(0, 0, 0))
 
 		if Objtype == "music" then
 			NewButton.MouseButton1Up:Connect(function()
@@ -229,6 +248,7 @@ end
 SetupUIThing("Layout", MainFrame, Enum.HorizontalAlignment.Center)
 SetupUIThing("Corner", MainFrame)
 SetupUIThing("Drag", MainFrame)
+SetupUIThings2("Stroke", "border", MainFrame, 2, Color3.new(0.0862745, 0.0862745, 0.0862745))
 SetupNewUIObj("Button","Change music to funny", "music")
 SetupNewUIObj("Button", "Turn off all light", "light")
 SetupNewUIObj("Button","Delete all exist walls(WIP)", "walls")
