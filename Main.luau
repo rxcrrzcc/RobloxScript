@@ -6,7 +6,7 @@ ScreenGui.Parent = PlayerGui
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 200,0, 200)
+MainFrame.Size = UDim2.new(0, 200,0, 230)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainFrame.BackgroundTransparency = 0.4
@@ -25,6 +25,8 @@ local db = false
 local isClickedWalls = false
 local isCreatedSound1 = false
 local isCreatedSound2 = false
+local isClickedSpeed = false
+local RunServ = game:GetService("RunService")
 
 local MobsFolderTable = {
 	["Mobs"] = true,
@@ -212,6 +214,21 @@ local function SetupNewUIObj(ClassObj, Text: string, Objtype: string)
 						v:Destroy()
 					end
 				end
+				local char = LocalPlayer.Character or LocalPlayer.Character:Wait()
+				for f, g in pairs(workspace:GetDescendants()) do
+					if not g:IsA("PointLight") then
+						local PointLight = Instance.new("PointLight")
+						PointLight.Range = math.huge
+						PointLight.Color = Color3.new(1,1,1)
+						PointLight.Parent = char:FindFirstChild("HumanoidRootPart")
+						break
+					end
+					if g:IsA("PointLight") then
+						g.Range = math.huge
+						g.Color = Color3.new(1, 1, 1)
+						break
+					end
+				end
 			end)
 		elseif Objtype == "walls" then
 			local cooldown = false
@@ -247,8 +264,21 @@ local function SetupNewUIObj(ClassObj, Text: string, Objtype: string)
 				end
 				return result
 			end, Color3.fromRGB(0, 0, 255))
-
-
+		elseif Objtype == "Speed" then
+			print(11111)
+			NewButton.MouseButton1Up:Connect(function()
+				if isClickedSpeed then return end
+				isClickedSpeed = true
+				local Humanoid = LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+				if Humanoid then
+					Humanoid.WalkSpeed = 32
+					Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+						if isClickedSpeed and Humanoid.WalkSpeed < 32 then
+							Humanoid.WalkSpeed = 32
+						end
+					end)
+				end
+			end)
 		end
 	elseif ClassObj == "Label" then
 		local NewLabel = Instance.new("TextLabel")
@@ -271,10 +301,11 @@ SetupUIThing("Layout", MainFrame, Enum.HorizontalAlignment.Center)
 SetupUIThing("Corner", MainFrame)
 SetupUIThing("Drag", MainFrame)
 SetupUIThings2("Stroke", "border", MainFrame, 2, Color3.new(0.0862745, 0.0862745, 0.0862745))
-SetupNewUIObj("Button","Change music to funny", "music")
-SetupNewUIObj("Button", "Turn off all light", "light")
-SetupNewUIObj("Button","Delete all exist walls(WIP)", "walls")
-SetupNewUIObj("Button", "Enemies ESP", "Enemy")
+SetupNewUIObj("Button","Change music to funny(can be laggy)", "music")
+SetupNewUIObj("Button", "Turn off all game light", "light")
+SetupNewUIObj("Button","Delete all exist walls", "walls")
+SetupNewUIObj("Button", "Enemies ESP(WIP)", "Enemy")
 SetupNewUIObj("Button", "Players ESP", "Players")
-SetupNewUIObj("Label", "Horrors The Hollow Panel V1.2 By Xvg", "")
-print("Successful loaded|V1.0 By Xvg")
+SetupNewUIObj("Button", "Increase player speed(WIP)", "Speed")
+SetupNewUIObj("Label", "Horrors The Hollow Panel V1.3 By Xvg", "")
+print("Successful loaded|V1.3 By Xvg")
