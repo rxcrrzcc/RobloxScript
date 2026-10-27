@@ -72,7 +72,7 @@ end
 
 local function CreateNewImbaSound(Stype, obj)
 	if obj == nil and Stype == "67" then return end
-	
+
 	if Stype == "background" and not isCreatedSound1 then
 		if isCreatedSound1 then return end
 		isCreatedSound1 = true
@@ -139,49 +139,69 @@ local function SetupNewUIObj(ClassObj, Text: string, Objtype: string)
 		local NewUICorner = Instance.new("UICorner")
 		NewUICorner.CornerRadius = UDim.new(0, 5)
 		NewUICorner.Parent = NewButton
-		
+
 		SetupUIThings2("Stroke", "border", NewButton, 2, Color3.new(0, 0, 0))
 
 		if Objtype == "music" then
+			local cooldown = false
 			NewButton.MouseButton1Up:Connect(function()
-				if IsClickedMusic then return end
-				IsClickedMusic = true
-				for i, v in pairs(game:GetDescendants()) do
-					if v:IsA("Sound") then
-						v:Stop()
-						v.Looped = false
-					end
-				end
-				CreateNewImbaSound("background", "")
-				for _, folder in workspace:GetDescendants() do
-					if MobsFolderTable[folder.Name] then
-
-						for _, mob in folder:GetChildren() do
-							if not mob:IsA("Model") then continue end
-							local targetPart = mob:FindFirstChild("HumanoidRootPart") 
-								or mob:FindFirstChild("Head") 
-								or mob:FindFirstChildWhichIsA("BasePart")
-								or mob:FindFirstChildWhichIsA("UnionOperation")
-							    or mob:FindFirstChildWhichIsA("MeshPart")
-							
-							if targetPart then
-								CreateNewImbaSound("67", targetPart)
-								local sound = targetPart:FindFirstChildWhichIsA("Sound")
-								if sound then
-									sound.SoundId = "rbxassetid://103561309094892"
-									sound:Play()
-									task.spawn(function()
-										while task.wait(3) do
-											sound:Play()
-										end
-									end)
+				if cooldown then return end
+				cooldown = true
+				local existingMusic = game.SoundService:FindFirstChild("NewMusic")
+				if existingMusic then
+					existingMusic:Destroy()
+					isCreatedSound1 = false
+					for _, folder in pairs(workspace:GetDescendants()) do
+						if MobsFolderTable[folder.Name] then
+							for _, mob in pairs(folder:GetChildren()) do
+								if not mob:IsA("Model") then continue end
+								local targetPart = mob:FindFirstChild("HumanoidRootPart")
+									or mob:FindFirstChild("Head")
+									or mob:FindFirstChildWhichIsA("BasePart")
+								if targetPart then
+									local sound = targetPart:FindFirstChild("Imba")
+									if sound then sound:Destroy() end
 								end
 							end
 						end
-
+					end
+				else
+					isCreatedSound1 = false
+					isCreatedSound2 = false
+					for _, v in pairs(game:GetDescendants()) do
+						if v:IsA("Sound") then
+							v:Stop()
+							v.Looped = false
+						end
+					end
+					CreateNewImbaSound("background", "")
+					for _, folder in pairs(workspace:GetDescendants()) do
+						if MobsFolderTable[folder.Name] then
+							for _, mob in pairs(folder:GetChildren()) do
+								if not mob:IsA("Model") then continue end
+								local targetPart = mob:FindFirstChild("HumanoidRootPart")
+									or mob:FindFirstChild("Head")
+									or mob:FindFirstChildWhichIsA("BasePart")
+									or mob:FindFirstChildWhichIsA("UnionOperation")
+									or mob:FindFirstChildWhichIsA("MeshPart")
+								if targetPart then
+									CreateNewImbaSound("67", targetPart)
+									local sound = targetPart:FindFirstChildWhichIsA("Sound")
+									if sound then
+										sound.SoundId = "rbxassetid://103561309094892"
+										sound:Play()
+										task.spawn(function()
+											while task.wait(3) do
+												sound:Play()
+											end
+										end)
+									end
+								end
+							end
+						end
 					end
 				end
-
+				task.delay(2, function() cooldown = false end)
 			end)
 		elseif Objtype == "light" then
 			NewButton.MouseButton1Up:Connect(function()
@@ -194,14 +214,16 @@ local function SetupNewUIObj(ClassObj, Text: string, Objtype: string)
 				end
 			end)
 		elseif Objtype == "walls" then
+			local cooldown = false
 			NewButton.MouseButton1Up:Connect(function()
-				if isClickedWalls then return end
-				isClickedWalls = true
-				for i, v in pairs(workspace:GetDescendants()) do
+				if cooldown then return end
+				cooldown = true
+				for _, v in pairs(workspace:GetDescendants()) do
 					if string.find(v.Name, "Wall") then
 						v:Destroy()
 					end
 				end
+				task.delay(3, function() cooldown = false end)
 			end)
 		elseif Objtype == "Enemy" then
 			createHighlightButton(NewButton, function()
